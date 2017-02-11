@@ -19,3 +19,19 @@ vcftools --vcf $rad51 --positions RAD51_funcSNV.txt --recode --out HN_RAD51_Rare
 (grep ^"#" HN_RAD51_Rare005_annoSNV.recode.vcf; grep -v ^"#" HN_RAD51_Rare005_annoSNV.recode.vcf | sed 's:^chr::ig' | sort -k1,1n -k2,2n) | bgzip -c > HN_RAD51_Rare005_annoSNV.recode.vcf.gz
 tabix -f -p vcf HN_RAD51_Rare005_annoSNV.recode.vcf.gz
 
+#risk association
+vcf=HN_RAD51_Rare005_annoSNV.recode.vcf.gz
+
+pheno=HN_DRC_apo_192Samples_pheno.txt
+gene=/home/bitnami/DNAseq/refFlat_hg19_target_gene.txt
+rvtest --inVcf $vcf --pheno $pheno --pheno-name status --kernel skat[nPerm=100:alpha=0.01:beta1=1:beta2=20] --geneFile $gene --covar $pheno --covar-name sex,age,smk,alco --out HN_status_RAD51_Rare005_skat_assoc
+#rvtest --inVcf $vcf --pheno $pheno --pheno-name status --burden cmcWald --geneFile $geno --covar $pheno --covar-name sex,age,smk,alco --out HN_status_RAD51_Rare005_burdenCMC_assoc
+rvtest --inVcf $vcf --pheno HN_DRC_apo_192Samples_pheno.txt --pheno-name status --burden zeggini --out HN_status_RAD51_Rare005
+
+vcftools --gzvcf $vcf --chr 15 --plink --out HN_RAD51_Rare005_annoSNV
+plink --file HN_RAD51_Rare005_annoSNV --recodeA --tab --noweb --out HN_RAD51_Rare005_annoSNV_4sas
+ 
+vcf=HN_BRCA1_Rare005_annoSNV.recode.vcf.gz
+vcftools --gzvcf $vcf --chr 17 --plink --out HN_BRCA1_Rare005_annoSNV
+plink --file HN_BRCA1_Rare005_annoSNV --recodeA --tab --noweb --out HN_BRCA1_Rare005_annoSNV_4sas
+
